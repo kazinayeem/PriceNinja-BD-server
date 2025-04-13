@@ -25,12 +25,7 @@ const browser = await puppeteer.launch({
     "--no-first-run",
     "--window-size=1920x1080",
   ],
-  executablePath:
-    process.env.NODE_ENV === "production"
-      ? "/usr/bin/google-chrome"
-      : undefined,
 });
-
 
 const scrapePage = async (url, callback) => {
   const browser = await launchBrowser();
