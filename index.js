@@ -106,11 +106,18 @@ async function scrapeTechland(query) {
 
   return products;
 }
+const axiosConfig = {
+  headers: {
+    "User-Agent":
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+  },
+};
+
 async function scrapeBinaryLogic(query) {
   const url = `https://www.binarylogic.com.bd/search/${encodeURIComponent(
     query
   )}`;
-  const { data } = await axios.get(url);
+  const { data } = await axios.get(url, axiosConfig);
   const $ = cheerio.load(data);
 
   const products = [];
