@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
-import chromium from "chrome-aws-lambda";
-import puppeteer from "puppeteer-core";
+import puppeteer from "puppeteer";
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -14,14 +13,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const launchBrowser = async () => {
-  const executablePath = await chromium.executablePath;
-
   return await puppeteer.launch({
-    args: chromium.args,
-    defaultViewport: chromium.defaultViewport,
-    executablePath,
-    headless: chromium.headless,
-    ignoreHTTPSErrors: true,
+    headless: true,
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
 };
 const scrapePage = async (url, callback) => {
