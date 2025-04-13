@@ -8,9 +8,7 @@
     "dev": "nodemon index.js",
     "postinstall": "puppeteer install"
   },
-  "puppeteer": {
-    "executablePath": "/usr/bin/chromium-browser"
-  },
+ 
   "keywords": [],
   "author": "",
   "license": "ISC",
