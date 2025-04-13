@@ -12,19 +12,25 @@ app.use(cors({ origin: "*" }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const launchBrowser = async () => {
-  return await puppeteer.launch({
-    headless: true,
-    args: [
-      "--no-sandbox",
-      "--disable-setuid-sandbox",
-      "--disable-gpu",
-      "--disable-software-rasterizer",
-      "--remote-debugging-port=9222",
-      "--start-maximized",
-    ],
-  });
-};
+const browser = await puppeteer.launch({
+  headless: true,
+  args: [
+    "--no-sandbox",
+    "--disable-setuid-sandbox",
+    "--disable-gpu",
+    "--disable-dev-shm-usage",
+    "--disable-accelerated-2d-canvas",
+    "--no-zygote",
+    "--single-process",
+    "--no-first-run",
+    "--window-size=1920x1080",
+  ],
+  executablePath:
+    process.env.NODE_ENV === "production"
+      ? "/usr/bin/google-chrome"
+      : undefined,
+});
+
 
 const scrapePage = async (url, callback) => {
   const browser = await launchBrowser();
