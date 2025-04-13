@@ -12,7 +12,7 @@ app.use(cors({ origin: "*" }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const browser = await puppeteer.launch({
+const launchBrowser = await puppeteer.launch({
   headless: true,
   args: [
     "--no-sandbox",
