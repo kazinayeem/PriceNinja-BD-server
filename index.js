@@ -14,6 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 
 const launchBrowser = async () => {
   return await puppeteer.launch({
+    executablePath: "/usr/bin/google-chrome",
     headless: true,
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
