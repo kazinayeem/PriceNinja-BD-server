@@ -13,12 +13,18 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 const PORT = process.env.PORT || 3000;
+const axiosConfig = {
+  headers: {
+    "User-Agent":
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+  },
+};
 
 async function scrapeStartech(query) {
   const url = `https://www.startech.com.bd/product/search?search=${encodeURIComponent(
     query
   )}`;
-  const { data } = await axios.get(url);
+  const { data } = await axios.get(url, axiosConfig);
   const $ = cheerio.load(data);
   const products = [];
   $(".p-item").each((_, el) => {
@@ -47,7 +53,7 @@ async function scrapeStartech(query) {
 }
 async function scrapeRyans(query) {
   const url = `https://www.ryans.com/search?q=${encodeURIComponent(query)}`;
-  const { data } = await axios.get(url);
+  const { data } = await axios.get(url, axiosConfig);
   const $ = cheerio.load(data);
 
   const products = [];
@@ -81,7 +87,7 @@ async function scrapeTechland(query) {
   const url = `https://www.techlandbd.com/index.php?route=product/search&search=${encodeURIComponent(
     query
   )}`;
-  const { data } = await axios.get(url);
+  const { data } = await axios.get(url, axiosConfig);
   const $ = cheerio.load(data);
 
   const products = [];
@@ -106,47 +112,41 @@ async function scrapeTechland(query) {
 
   return products;
 }
-const axiosConfig = {
-  headers: {
-    "User-Agent":
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-  },
-};
 
-async function scrapeBinaryLogic(query) {
-  const url = `https://www.binarylogic.com.bd/search/${encodeURIComponent(
-    query
-  )}`;
-  const { data } = await axios.get(url, axiosConfig);
-  const $ = cheerio.load(data);
+// async function scrapeBinaryLogic(query) {
+//   const url = `https://www.binarylogic.com.bd/search/${encodeURIComponent(
+//     query
+//   )}`;
+//   const { data } = await axios.get(url, axiosConfig);
+//   const $ = cheerio.load(data);
 
-  const products = [];
+//   const products = [];
 
-  $(".single_product").each((_, el) => {
-    const name = $(el).find(".p-item-name a").text().trim();
-    const link = $(el).find(".p-item-name a").attr("href");
-    const image = $(el).find(".p-item-img img").attr("src");
-    const priceNew = $(el).find(".current_price").text().trim();
-    const priceOld = $(el).find(".old_price").text().trim();
-    const stock = $(el).find(".new-product-badge a").text().trim();
+//   $(".single_product").each((_, el) => {
+//     const name = $(el).find(".p-item-name a").text().trim();
+//     const link = $(el).find(".p-item-name a").attr("href");
+//     const image = $(el).find(".p-item-img img").attr("src");
+//     const priceNew = $(el).find(".current_price").text().trim();
+//     const priceOld = $(el).find(".old_price").text().trim();
+//     const stock = $(el).find(".new-product-badge a").text().trim();
 
-    products.push({
-      name,
-      link,
-      image,
-      price: priceNew || priceOld || "Not Available",
-      oldPrice: priceOld || null,
-      stock: stock || "Unknown",
-    });
-  });
+//     products.push({
+//       name,
+//       link,
+//       image,
+//       price: priceNew || priceOld || "Not Available",
+//       oldPrice: priceOld || null,
+//       stock: stock || "Unknown",
+//     });
+//   });
 
-  return products;
-}
+//   return products;
+// }
 async function scrapePcHouse(query) {
   const url = `https://www.pchouse.com.bd/index.php?route=product/search&search=${encodeURIComponent(
     query
   )}`;
-  const { data } = await axios.get(url);
+  const { data } = await axios.get(url, axiosConfig);
   const $ = cheerio.load(data);
 
   const products = [];
@@ -181,7 +181,7 @@ async function scrapePotakait(query) {
   const url = `https://www.potakait.com/index.php?route=product/search&search=${encodeURIComponent(
     query
   )}`;
-  const { data } = await axios.get(url);
+  const { data } = await axios.get(url, axiosConfig);
   const $ = cheerio.load(data);
 
   const products = [];
@@ -212,7 +212,7 @@ async function scrapeComputerMania(query) {
   const url = `https://computermania.com.bd/?s=${encodeURIComponent(
     query
   )}&post_type=product`;
-  const { data } = await axios.get(url);
+  const { data } = await axios.get(url, axiosConfig);
   const $ = cheerio.load(data);
 
   const products = [];
@@ -255,7 +255,7 @@ app.get("/api/scrape", async (req, res) => {
       scrapeStartech(query),
       scrapeRyans(query),
       scrapeTechland(query),
-      scrapeBinaryLogic(query),
+      // scrapeBinaryLogic(query),
       scrapePcHouse(query),
       scrapePotakait(query),
       scrapeComputerMania(query),
@@ -266,7 +266,7 @@ app.get("/api/scrape", async (req, res) => {
       startech: results[0],
       ryans: results[1],
       techland: results[2],
-      binaryLogic: results[3],
+      // binaryLogic: results[3],
       pcHouse: results[4],
       potakait: results[5],
       computerMania: results[6],
