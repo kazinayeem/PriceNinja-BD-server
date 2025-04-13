@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
-import puppeteer from "puppeteer";
-
+import puppeteer from "puppeteer-core";
+import chromium from "@sparticuz/chromium";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -14,18 +14,12 @@ app.use(express.urlencoded({ extended: true }));
 
 const launchBrowser = async () => {
   return await puppeteer.launch({
+    args: chromium.args,
+    defaultViewport: chromium.defaultViewport,
+    executablePath: await chromium.executablePath(),
+    headless: chromium.headless,
+    ignoreHTTPSErrors: true,
     headless: true,
-    args: [
-      "--no-sandbox",
-      "--disable-setuid-sandbox",
-      "--disable-gpu",
-      "--disable-dev-shm-usage",
-      "--disable-accelerated-2d-canvas",
-      "--no-zygote",
-      "--single-process",
-      "--no-first-run",
-      "--window-size=1920x1080",
-    ],
   });
 };
 
