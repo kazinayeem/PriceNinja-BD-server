@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
-import puppeteer from "puppeteer";
+import chromium from "chrome-aws-lambda";
+import puppeteer from "puppeteer-core";
+
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -11,20 +13,36 @@ app.use(cors({ origin: "*" }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const launchBrowser = async () =>
-  await puppeteer.launch({ headless: "new", args: ["--no-sandbox"] });
+const launchBrowser = async () => {
+  const executablePath = await chromium.executablePath;
 
+  return await puppeteer.launch({
+    args: chromium.args,
+    defaultViewport: chromium.defaultViewport,
+    executablePath,
+    headless: chromium.headless,
+    ignoreHTTPSErrors: true,
+  });
+};
 const scrapePage = async (url, callback) => {
   const browser = await launchBrowser();
   const page = await browser.newPage();
+
   await page.setUserAgent(
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
   );
-  await page.goto(url, { waitUntil: "domcontentloaded" });
-  const content = await page.content();
-  const result = await callback(content);
-  await browser.close();
-  return result;
+
+  try {
+    await page.goto(url, { waitUntil: "networkidle2", timeout: 60000 });
+    const content = await page.content();
+    const result = await callback(content);
+    await browser.close();
+    return result;
+  } catch (err) {
+    console.error(`❌ Failed to scrape ${url}:`, err.message);
+    await browser.close();
+    return [];
+  }
 };
 
 import * as cheerio from "cheerio";
@@ -214,6 +232,7 @@ app.get("/api/scrape", async (req, res) => {
       scrapePotakait(query),
       scrapeComputerMania(query),
     ]);
+    console.log("Scraping Results:", results);
 
     const storeResults = {
       startech: results[0].value || [],
